@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiTaskManager.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MauiTaskManager.ViewModels"
+    xmlns:conv="clr-namespace:MauiTaskManager.Converters"
+    x:Name="MainPageRef"
+    Title="Home">
+
+    <!-- ===================== -->
+    <!-- Resources             -->
+    <!-- ===================== -->
+    <ContentPage.Resources>
+        <conv:CompletedTextConverter x:Key="CompletedConverter" />
+    </ContentPage.Resources>
+
+    <!-- ===================== -->
+    <!-- ViewModel              -->
+    <!-- ===================== -->
+    <ContentPage.BindingContext>
+        <vm:TasksViewModel />
+    </ContentPage.BindingContext>
+
+    <!-- ===================== -->
+    <!-- UI Layout              -->
+    <!-- ===================== -->
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <!-- Title -->
+        <Label
+            Text="MY TASKS"
+            FontSize="28"
+            HorizontalOptions="Center"
+            Margin="0,10" />
+
+        <!-- TwoWay Binding -->
+        <Entry
+            Placeholder="Enter new task"
+            Text="{Binding NewTaskTitle, Mode=TwoWay}" />
+
+        <!-- Command Binding -->
+        <Button
+            Text="Add Task"
+            Command="{Binding AddTaskCommand}" />
+
+        <!-- ===================== -->
+        <!-- Task List              -->
+        <!-- ===================== -->
+        <CollectionView
+            ItemsSource="{Binding Tasks}"
+            SelectedItem="{Binding SelectedTask, Mode=OneWayToSource}"
+            Margin="0,10,0,0">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <!-- GRID để căn chỉnh cân xứng -->
+                    <Grid
+                        ColumnDefinitions="Auto,*"
+                        Padding="8"
+                        VerticalOptions="Center">
+
+                        <!-- Checkbox -->
+                        <CheckBox
+                            Grid.Column="0"
+                            VerticalOptions="Center"
+                            IsChecked="{Binding IsCompleted, Mode=TwoWay}" />
+
+                        <!-- Task Title -->
+                        <Label
+                            Grid.Column="1"
+                            VerticalOptions="Center"
+                            FontSize="16"
+                            Text="{Binding Title}"
+                            TextDecorations="{Binding IsCompleted,
+                                Converter={StaticResource CompletedConverter}}" />
+                    </Grid>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <!-- ===================== -->
+        <!-- x:Reference (UI-UI)    -->
+        <!-- ===================== -->
+        <Label
+            Text="{Binding Source={x:Reference MainPageRef}, Path=Title}"
+            IsVisible="False" />
+
+        <!-- ===================== -->
+        <!-- MultiBinding Summary   -->
+        <!-- ===================== -->
+        <Label FontAttributes="Bold" Margin="0,10,0,0">
+            <Label.Text>
+                <MultiBinding StringFormat="Total: {0} | Completed: {1}">
+                    <Binding Path="TotalCount" />
+                    <Binding Path="CompletedCount" />
+                </MultiBinding>
+            </Label.Text>
+        </Label>
+
+    </VerticalStackLayout>
+</ContentPage>
